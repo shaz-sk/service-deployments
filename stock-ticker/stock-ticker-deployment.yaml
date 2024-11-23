@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-ticker-deployment
+  labels:
+    app: stock-ticker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stock-ticker
+  template:
+    metadata:
+      labels:
+        app: stock-ticker
+    spec:
+      containers:
+        - name: stock-ticker
+          image: shaz900/stock-ticker-service
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SYMBOL
+              valueFrom:
+                configMapKeyRef:
+                  name: stock-ticker-config
+                  key: SYMBOL
+            - name: NDAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: stock-ticker-config
+                  key: NDAYS
+            - name: APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: stock-ticker-secret
+                  key: APIKEY
