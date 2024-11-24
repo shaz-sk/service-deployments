@@ -5,10 +5,15 @@ metadata:
   labels:
     app: stock-ticker
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: stock-ticker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -16,8 +21,8 @@ spec:
     spec:
       containers:
         - name: stock-ticker
-          image: shaz900/stock-ticker-service
-          imagePullPolicy: IfNotPresent
+          image: shaz900/stock-ticker-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
@@ -36,3 +41,9 @@ spec:
                 secretKeyRef:
                   name: stock-ticker-secret
                   key: APIKEY
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 20
