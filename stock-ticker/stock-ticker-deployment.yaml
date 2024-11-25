@@ -25,6 +25,19 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: 500m  # Minimum CPU requested for the container
+              memory: 2Gi  # Minimum memory requested for the container
+            limits:
+              cpu: 1000m  # Maximum CPU allowed for the container
+              memory: 4Gi  # Maximum memory allowed for the container
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 20
           env:
             - name: SYMBOL
               valueFrom:
@@ -41,9 +54,4 @@ spec:
                 secretKeyRef:
                   name: stock-ticker-secret
                   key: APIKEY
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 20
+
